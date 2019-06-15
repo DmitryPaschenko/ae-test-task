@@ -1,6 +1,5 @@
 import sys
 from bs4 import BeautifulSoup
-
 from libs.html import HtmlElement
 from libs.checkers import ClassChecker, TextChecker
 
@@ -30,12 +29,10 @@ def has_same_element(file_path, orig_element):
         ClassChecker,  # if you want to add more checks just create checker and add it to this list
     ]
 
-    tag_name = orig_element.tag_name
-
     with open(file_path, 'r') as f:
         content = f.read()
         soup = BeautifulSoup(content, 'html.parser')
-        elements = soup.find_all(tag_name)
+        elements = soup.find_all()
         for element in elements:
             html_element = HtmlElement(bs_element=element)
             if same(orig_element, html_element, checkers):
