@@ -1,3 +1,4 @@
+import sys
 from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup
 
@@ -106,10 +107,15 @@ def get_element_info(file_path, css_selector):
 
 
 if __name__ == '__main__':
-    css_selector = 'a[id=make-everything-ok-button]'
-    orig_file_path = 'res/sample-0-origin.html'
-    diff_file_path = 'res/sample-1-evil-gemini.html'
 
+    if len(sys.argv) >= 3:
+        orig_file_path = sys.argv[1]
+        diff_file_path = sys.argv[2]
+    else:
+        orig_file_path = 'res/sample-0-origin.html'
+        diff_file_path = 'res/sample-1-evil-gemini.html'
+
+    css_selector = 'a[id=make-everything-ok-button]'
     orig_element_info = get_element_info(orig_file_path, css_selector)
     print('File "{}" HAS {}same element'.format(
         diff_file_path,
