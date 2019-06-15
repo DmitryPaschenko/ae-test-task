@@ -1,80 +1,33 @@
 import sys
-from abc import ABC, abstractmethod
 from bs4 import BeautifulSoup
 
-
-class HtmlElement(object):
-    '''
-    HTML element based on bs4 HTML element object
-    '''
-    __bs_element = None
-    attrs=[]
-    text=''
-
-    def __init__(self, bs_element):
-        self.__bs_element = bs_element
-        self.attrs = bs_element.attrs
-        self.text = bs_element.text.strip()
-        self.tag_name = bs_element.name
-
-    def get_element_attr(self, attr):
-        return self.attrs.get(attr, None)
-
-
-class Checker(ABC):
-    '''
-    Base class for all required checkers
-    '''
-    _orig_element = None
-    _html_element = None
-
-    def __init__(self, orig_element, html_element):
-        self._orig_element = orig_element
-        self._html_element = html_element
-
-    @abstractmethod
-    def check(self):
-        raise NotImplemented()
-
-
-class TextChecker(Checker):
-    '''
-    Checker for check text two HTML elements
-    '''
-    def check(self):
-        return self._orig_element.text.strip() == self._html_element.text.strip()
-
-
-class ClassChecker(Checker):
-    '''
-    Checker for check css classes for two HTML elements
-    '''
-    def check(self):
-        return self._orig_element.get_element_attr('class') == self._html_element.get_element_attr('class')
+from libs.html import HtmlElement
+from libs.checkers import ClassChecker, TextChecker
 
 
 def same(orig_element, html_element, checkers):
-    '''
+    """
     Compare two html elements according passed checkers
     :param orig_element:
     :param html_element:
     :param checkers:
     :return:
-    '''
+    """
+
     return all([check_class(orig_element, html_element).check() for check_class in checkers])
 
 
 def has_same_element(file_path, orig_element):
-    '''
+    """
     Check if "different" file has origin elements
     :param file_path:
     :param orig_element:
     :return:
-    '''
+    """
 
     checkers = [
         TextChecker,
-        ClassChecker,  # if you want more checks just create checker and add it to this list
+        ClassChecker,  # if you want to add more checks just create checker and add it to this list
     ]
 
     tag_name = orig_element.tag_name
@@ -92,6 +45,14 @@ def has_same_element(file_path, orig_element):
 
 
 def get_element_info(file_path, css_selector):
+    """
+    Get info about target element
+
+    :param file_path: Path to original HTML file
+    :param css_selector: Css Selector of target HTML element
+    :return: HtmlElement
+    """
+
     with open(file_path, 'r') as f:
         content = f.read()
         soup = BeautifulSoup(content, 'html.parser')
@@ -107,7 +68,6 @@ def get_element_info(file_path, css_selector):
 
 
 if __name__ == '__main__':
-
     if len(sys.argv) >= 3:
         orig_file_path = sys.argv[1]
         diff_file_path = sys.argv[2]
@@ -121,4 +81,3 @@ if __name__ == '__main__':
         diff_file_path,
         '' if has_same_element(diff_file_path, orig_element_info) else 'NOT '
     ))
-
